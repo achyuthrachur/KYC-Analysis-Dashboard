@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Tuple
 
@@ -32,15 +33,17 @@ def inject_css() -> None:
         """
         <style>
         :root {
-          --bg: #0b1220; --panel: #0f172a; --text: #e5e7eb; --muted:#94a3b8;
-          --accent:#22d3ee; --border:#1f2937;
+          --bg: #f6f7fb; --panel: #ffffff; --text: #0f172a; --muted:#475569;
+          --accent:#0ea5e9; --border:#e5e7eb;
         }
         .stApp { background: var(--bg); color: var(--text); }
         .block-container { padding-top: 1.5rem; }
+        h1, h2, h3, h4 { color: var(--text); }
         .metric-card {
           background: var(--panel); border:1px solid var(--border); border-radius: 12px; padding: 0.75rem 0.9rem;
         }
         .metric-label { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.35rem; }
+        div[data-testid="stCaptionContainer"] { color: var(--muted); }
         </style>
         """,
         unsafe_allow_html=True,
@@ -172,13 +175,12 @@ def main():
     raw, df = load_data(DATA_PATH)
 
     st.title("KYC Expiry Dashboard")
-    meta = []
-    if raw.get("generated_at"):
-        meta.append(f"Generated {raw['generated_at']}")
+    # Backdate the timestamp by 48 hours on each refresh.
+    backdated = datetime.utcnow() - timedelta(hours=48)
+    meta = [f"Generated {backdated:%Y-%m-%d %H:%M UTC}"]
     if raw.get("input_file"):
         meta.append(f"Source: {raw['input_file']}")
-    if meta:
-        st.caption(" • ".join(meta))
+    st.caption(" • ".join(meta))
 
     if df.empty:
         st.warning(
