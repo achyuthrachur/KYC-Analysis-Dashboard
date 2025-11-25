@@ -134,7 +134,7 @@ def render_table(df: pd.DataFrame):
         use_container_width=True,
         hide_index=True,
         column_config={
-            "days_to_expiry": st.column_config.NumberColumn("Days", format="d"),
+            "days_to_expiry": st.column_config.NumberColumn("Days", format="%d"),
             "doc_expiry_date": st.column_config.DateColumn("Expiry Date"),
             "risk_rating": st.column_config.TextColumn("Risk"),
         },
